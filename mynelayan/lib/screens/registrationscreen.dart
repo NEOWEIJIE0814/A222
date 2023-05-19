@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import '../MyConfig.dart';
+
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -217,19 +221,50 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   void registerUser() {
+     showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return const AlertDialog(
+          title: Text("Please Wait"),
+          content: Text("Registration..."),
+        );
+      },
+    );
+
     String name = _nameEditingController.text;
     String email = _emailEditingController.text;
     String phone = _phoneEditingController.text;
     String passa = _passEditingController.text;
 
-    http.post(Uri.parse("http://10.144.152.24//mynelayan/php/register_user.php"),
+    http.post(Uri.parse("${MyConfig().SERVER}/mynelayan/php/register_user.php"),
         body: {
           "name": name,
           "email": email,
           "phone": phone,
           "password": passa,
         }).then((response) {
+          
       print(response.body);
+
+    if (response.statusCode == 200) {
+        var jsondata = jsonDecode(response.body);
+
+        if (jsondata['status'] == 'success') {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Registration Success")));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Registration Failed")));
+        }
+        Navigator.pop(context);
+
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text("Registration Failed")));
+        Navigator.pop(context);
+      }
+    
+    
     });
   }
 }

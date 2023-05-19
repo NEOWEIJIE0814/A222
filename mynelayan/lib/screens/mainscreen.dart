@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 
+import '../models/user.dart';
 import 'buyertabscreen.dart';
 import 'newstabscreen.dart';
 import 'profiletabscreen.dart';
@@ -10,7 +11,9 @@ import 'sellertabscreen.dart';
 //for buyer screen
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final User user;
+  
+  const MainScreen({super.key ,required this.user});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -26,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     print("Buyer");
     tabchildren = const [
-      BuyerTabScreen(),
+      BuyerTabScreen(), // (user: widget.user) to pass user class to other screen 
       SellerTabScreen(),
       ProfileTabScreen(),
       NewsTabScreen()

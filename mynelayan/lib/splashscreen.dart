@@ -1,7 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mynelayan/screens/mainscreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/user.dart';
+import 'package:http/http.dart'as http;
 
+import 'MyConfig.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,11 +19,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState(){
     super.initState();
-    Timer(
+    checkAndLogin();
+    /*Timer(
       const Duration(seconds: 3),
       () => Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: (context) => const MainScreen())) 
-    );
+        MaterialPageRoute(builder: (context) =>   MainScreen(user: User(),))) 
+    );*/
   }
 
   @override
@@ -53,4 +59,61 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
-}
+  
+  void checkAndLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String email = (prefs.getString('email')) ?? '';
+    String password = (prefs.getString('pass')) ?? '';
+    bool ischeck = (prefs.getBool('checkbox')) ?? false;
+    late User user;
+    if (ischeck) {
+      try {
+        http.post(
+            Uri.parse("${MyConfig().SERVER}/mynelayan/php/login_user.php"),
+            body: {"email": email, "password": password}).then((response) {
+          if (response.statusCode == 200) {
+            var jsondata = jsonDecode(response.body);
+            user = User.fromJson(jsondata['data']);
+            Timer(
+                const Duration(seconds: 3),
+                () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (content) => MainScreen(user: user))));
+          } else {
+            user = User(
+                id: "na",
+                name: "na",
+                email: "na",
+                phone: "na",
+                datereg: "na",
+                password: "na",
+                otp: "na");
+            Timer(
+                const Duration(seconds: 3),
+                () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (content) => MainScreen(user: user))));
+          }
+        }).timeout(const Duration(seconds: 5), onTimeout: () {
+          // Time has run out, do what you wanted to do.
+        });
+      } on TimeoutException catch (_) {
+        print("Time out");
+      }
+    } else {
+      user = User(
+          id: "na",
+          name: "na",
+          email: "na",
+          phone: "na",
+          datereg: "na",
+          password: "na",
+          otp: "na");
+      Timer(
+          const Duration(seconds: 3),
+          () => Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (content) => MainScreen(user: user))));
+  }
+}}
