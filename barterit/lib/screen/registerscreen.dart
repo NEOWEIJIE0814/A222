@@ -1,41 +1,48 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
 
-import '../MyConfig.dart';
+import '../myconfig.dart';
 
-
-class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<RegistrationScreen> createState() => _RegistrationScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegistrationScreenState extends State<RegistrationScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  
   final TextEditingController _nameEditingController = TextEditingController();
   final TextEditingController _emailEditingController = TextEditingController();
-  final TextEditingController _phoneEditingController = TextEditingController();
   final TextEditingController _passEditingController = TextEditingController();
   final TextEditingController _pass2EditingController = TextEditingController();
   bool _isChecked = false;
   final _formKey = GlobalKey<FormState>();
+  
+  @override
+  void initState() {
+    super.initState();
+    print("Register");
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return  Scaffold(
       appBar: AppBar(
-        title: const Text("User Registration "),
+        title: const Text("Registration "),
+        backgroundColor: Colors.transparent,
+        foregroundColor: Theme.of(context).colorScheme.secondary,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             Container(
               height: 200,
-              child: Image.asset(
-                "assets/images/register.png",
-                fit: BoxFit.cover,
-              ),
+              width: 400,
+              child: Image.asset("assets/images/register.png", fit: BoxFit.cover,),
             ),
             Card(
               elevation: 8,
@@ -59,20 +66,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   labelText: 'Name',
                                   labelStyle: TextStyle(),
                                   icon: Icon(Icons.person),
-                                  focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(width: 2.0))),
-                            ),
-                            TextFormField(
-                              controller: _phoneEditingController,
-                              keyboardType: TextInputType.phone,
-                              validator: (val) =>
-                                  val!.isEmpty || (val.length < 10)
-                                      ? "phone must be longer or equal to 10"
-                                      : null,
-                              decoration: const InputDecoration(
-                                  labelText: 'Phone',
-                                  labelStyle: TextStyle(),
-                                  icon: Icon(Icons.phone),
                                   focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(width: 2.0))),
                             ),
@@ -195,7 +188,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 style: TextStyle(),
               ),
               onPressed: () {
-                Navigator.of(context).pop();
+                
                 registerUser();
               },
             ),
@@ -205,7 +198,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 style: TextStyle(),
               ),
               onPressed: () {
-                Navigator.of(context).pop();
+                
               },
             ),
           ],
@@ -214,8 +207,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
   
-  void registerUser() {
-     showDialog(
+  void registerUser() {showDialog(
       context: context,
       builder: (BuildContext context) {
         return const AlertDialog(
@@ -227,18 +219,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
     String name = _nameEditingController.text;
     String email = _emailEditingController.text;
-    String phone = _phoneEditingController.text;
     String passa = _passEditingController.text;
 
-    http.post(Uri.parse("${MyConfig().SERVER}/mynelayan/php/register_user.php"),
+    http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/register.php"),
         body: {
           "name": name,
           "email": email,
-          "phone": phone,
           "password": passa,
         }).then((response) {
           
-      print(response.body);
+      //print(response.body);
 
 
     if (response.statusCode == 200) {
@@ -282,4 +272,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     
   });
 }
+
+
 }
