@@ -28,10 +28,10 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     print("Buyer");
-    tabchildren = const [
+    tabchildren = [
       BuyerTabScreen(), // (user: widget.user) to pass user class to other screen 
-      SellerTabScreen(),
-      ProfileTabScreen(),
+      SellerTabScreen(user: widget.user),
+      ProfileTabScreen(user: widget.user),
       NewsTabScreen()
     ];
   }

@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart'as http;
+import 'package:http/http.dart' as http;
 import 'package:mynelayan/screens/mainscreen.dart';
-import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:shared_preferences/shared_preferences.dart';
 import '../MyConfig.dart';
 import '../models/user.dart';
 import 'registrationscreen.dart';
@@ -28,6 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     loadPref();
   }
+
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
@@ -170,49 +171,55 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void onLogin() {
-    if(!_formKey.currentState!.validate()){
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Check Your Input")));
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Check Your Input")));
       return;
     }
     String email = _emailEditingController.text;
     String pass = _passEditingController.text;
     print(pass);
 
-    try{
+    try {
       http.post(Uri.parse("${MyConfig().SERVER}/mynelayan/php/login_user.php"),
-        body: {
-          "email": email,
-          "password": pass,
-
-        }).then((response){
-          print(response.body);
-          if (response.statusCode==200){
-            var jsondata = jsonDecode(response.body);
-            if(jsondata["status"]=='success'){
-              User user = User.fromJson(jsondata['data']);
-              print(user.name)  ;
-              print(user.email);
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Login Success")));
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen(
-                user: user,
-              ),));
-            }else{
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Login Failed")));
-            }
+          body: {
+            "email": email,
+            "password": pass,
+          }).then((response) {
+        print(response.body);
+        if (response.statusCode == 200) {
+          var jsondata = jsonDecode(response.body);
+          if (jsondata["status"] == 'success') {
+            User user = User.fromJson(jsondata['data']);
+            print(user.name);
+            print(user.email);
+            ScaffoldMessenger.of(context)
+                .showSnackBar(const SnackBar(content: Text("Login Success")));
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MainScreen(
+                    user: user,
+                  ),
+                ));
+          } else {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(const SnackBar(content: Text("Login Failed")));
           }
-        }).timeout(const Duration(seconds: 5), onTimeout: (){});
-    
-    }on TimeoutException catch (_) {
+        }
+      }).timeout(const Duration(seconds: 5), onTimeout: () {});
+    } on TimeoutException catch (_) {
       print("Time out");
-  }}
-   
+    }
+  }
+
   void _forgotDialog() {}
 
   void _goToRegister() {
     Navigator.push(context,
         MaterialPageRoute(builder: (content) => const RegistrationScreen()));
   }
-  
+
   void saveremovepref(bool value) async {
     FocusScope.of(context).requestFocus(FocusNode());
     String email = _emailEditingController.text;
@@ -242,9 +249,8 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("Preferences Removed")));
     }
-
   }
-  
+
   Future<void> loadPref() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String email = (prefs.getString('email')) ?? '';
@@ -257,8 +263,4 @@ class _LoginScreenState extends State<LoginScreen> {
       });
     }
   }
-
-  }
-
-  
-
+}

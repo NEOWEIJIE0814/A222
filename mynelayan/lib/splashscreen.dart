@@ -1,66 +1,71 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:mynelayan/myconfig.dart';
 import 'package:mynelayan/screens/mainscreen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../models/user.dart';
-import 'package:http/http.dart'as http;
 
-import 'MyConfig.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'models/user.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  State<SplashScreen> createState() => SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class SplashScreenState extends State<SplashScreen> {
   @override
-  void initState(){
+  void initState() {
     super.initState();
     checkAndLogin();
-    /*Timer(
-      const Duration(seconds: 3),
-      () => Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: (context) =>   MainScreen(user: User(),))) 
-    );*/
+    //loadPref();
+    // Timer(
+    //     const Duration(seconds: 3),
+    //     () => Navigator.pushReplacement(context,
+    //         MaterialPageRoute(builder: (content) =>  MainScreen())));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-              decoration: const BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage('assets/images/splash.png'),
-                      fit: BoxFit.cover))),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 50, 0, 20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text(
-                  "MY NELAYAN",
-                  style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold,),
-                ),
-                CircularProgressIndicator(),
-                Text(
-                  "Version 0.1",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
-    );
+        body: Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+            decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/images/splash.png'),
+                    fit: BoxFit.cover))),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(0, 50, 0, 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "MYNELAYAN",
+                style: TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+              CircularProgressIndicator(),
+              Text(
+                "Version 0.1",
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              )
+            ],
+          ),
+        )
+      ],
+    ));
   }
-  
-  void checkAndLogin() async {
+
+  checkAndLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String email = (prefs.getString('email')) ?? '';
     String password = (prefs.getString('pass')) ?? '';
@@ -115,5 +120,6 @@ class _SplashScreenState extends State<SplashScreen> {
           const Duration(seconds: 3),
           () => Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (content) => MainScreen(user: user))));
+    }
   }
-}}
+}

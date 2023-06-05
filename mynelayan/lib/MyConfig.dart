@@ -1,3 +1,3 @@
 class MyConfig{
-  String SERVER = "http://10.144.147.98";
+  String SERVER = "http://10.144.161.31";
 }
