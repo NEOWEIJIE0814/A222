@@ -1,6 +1,6 @@
+import 'package:barterit/color_schemes.g.dart';
 import 'package:barterit/splashscreen.dart';
 import 'package:flutter/material.dart';
-
 
 void main() => runApp(const MyApp());
 
@@ -11,9 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'BarterIt App',
-      theme: ThemeData(
-        primarySwatch: Colors.amber
-      ),
+      theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
       home: const SplashScreen(),
     );
   }

@@ -9,7 +9,8 @@ import 'package:http/http.dart'as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final User user;
+  const LoginScreen({super.key, required this.user});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -190,7 +191,8 @@ class _LoginScreenState extends State<LoginScreen> {
             var jsondata = jsonDecode(response.body);
             if(jsondata["status"]=='success'){
               User user = User.fromJson(jsondata['data']);
-              print(user.name)  ;
+              print(user.id);
+              print(user.name);
               print(user.email);
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Login Success")));
               // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen(),));
@@ -209,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _goToRegister() {
     Navigator.push(context,
-        MaterialPageRoute(builder: (content) => const RegisterScreen()));
+        MaterialPageRoute(builder: (content) =>  RegisterScreen(user: widget.user,)));
   }
   
   void saveremovepref(bool value) async {

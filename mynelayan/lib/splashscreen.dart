@@ -6,7 +6,9 @@ import 'package:mynelayan/screens/mainscreen.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+
 import 'models/user.dart';
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -21,10 +23,7 @@ class SplashScreenState extends State<SplashScreen> {
     super.initState();
     checkAndLogin();
     //loadPref();
-    // Timer(
-    //     const Duration(seconds: 3),
-    //     () => Navigator.pushReplacement(context,
-    //         MaterialPageRoute(builder: (content) =>  MainScreen())));
+    
   }
 
   @override
@@ -103,6 +102,10 @@ class SplashScreenState extends State<SplashScreen> {
           }
         }).timeout(const Duration(seconds: 5), onTimeout: () {
           // Time has run out, do what you wanted to do.
+          () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (content) => MainScreen(user: user)));
         });
       } on TimeoutException catch (_) {
         print("Time out");

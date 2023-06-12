@@ -1,3 +1,6 @@
+
+import 'package:barterit/model/user.dart';
+import 'package:barterit/screen/owneritemscreen.dart';
 import 'package:barterit/screen/loginscreen.dart';
 import 'package:barterit/screen/registerscreen.dart';
 import 'package:flutter/material.dart';
@@ -5,26 +8,28 @@ import 'package:flutter/material.dart';
 import 'mainscreen.dart';
 
 class ControlScreen extends StatefulWidget {
-  const ControlScreen({super.key});
+  final User user;
+  const ControlScreen({super.key,required this.user});
 
   @override
   State<ControlScreen> createState() => _ControlScreenState();
 }
 
 class _ControlScreenState extends State<ControlScreen> {
-  late List<Widget> tabchildren;
+  late List<Widget> tabchildren; 
   int _currentIndex = 0;
   String maintitle = "Main";
 
   @override
   void initState() {
     super.initState();
-   // print(widget.user.name);
+   //\print(widget.user.name);
     print("Mainscreen");
     tabchildren = [
       MainScreen(),
-      LoginScreen(),
-      RegisterScreen(),
+      OwnerItemScreen(user: widget.user),
+      LoginScreen(user: widget.user),
+      RegisterScreen(user: widget.user),
     ];
   }
   
@@ -50,6 +55,11 @@ class _ControlScreenState extends State<ControlScreen> {
                 label: "Main"),
             BottomNavigationBarItem(
                 icon: Icon(
+                  Icons.card_giftcard_outlined,
+                ),
+                label: "Owner"),    
+            BottomNavigationBarItem(
+                icon: Icon(
                   Icons.door_front_door,
                 ),
                 label: "Login"),
@@ -70,9 +80,12 @@ class _ControlScreenState extends State<ControlScreen> {
         maintitle = "Main";
       }
       if (_currentIndex == 1) {
-        maintitle = "Login";
+        maintitle = "Owner";
       }
       if (_currentIndex == 2) {
+        maintitle = "Login";
+      }
+      if (_currentIndex == 3) {
         maintitle = "Register";
       }
       

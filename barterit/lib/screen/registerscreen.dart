@@ -1,11 +1,13 @@
 import 'dart:convert';
+import 'package:barterit/model/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 import '../myconfig.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  final User user;
+  const RegisterScreen({super.key, required this.user});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();

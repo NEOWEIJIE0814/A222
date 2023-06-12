@@ -58,7 +58,7 @@ class _SellerTabScreenState extends State<SellerTabScreen> {
           : Column(children: [
               Container(
                 height: 24,
-                color: Colors.red,
+                color: Colors.purple,
                 alignment: Alignment.center,
                 child: Text(
                   "${catchList.length} Catch Found",
@@ -72,6 +72,7 @@ class _SellerTabScreenState extends State<SellerTabScreen> {
                         catchList.length,
                         (index) {
                           return Card(
+                            
                             child: InkWell(
                               onLongPress: () {
                                 onDeleteDialog(index);
@@ -89,7 +90,7 @@ class _SellerTabScreenState extends State<SellerTabScreen> {
                                 ),
                                 Text(
                                   catchList[index].catchName.toString(),
-                                  style: const TextStyle(fontSize: 20),
+                                  style: const TextStyle(fontSize:16, fontWeight: FontWeight.bold),
                                 ),
                                 Text(
                                   "RM ${double.parse(catchList[index].catchPrice.toString()).toStringAsFixed(2)}",
