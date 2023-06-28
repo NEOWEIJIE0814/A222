@@ -7,6 +7,7 @@ import 'package:mynelayan/models/catch.dart';
 import 'package:mynelayan/models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:mynelayan/myconfig.dart';
+import 'editcatchscreen.dart';
 import 'newcatchscreen.dart';
 
 // for fisherman screen
@@ -50,7 +51,9 @@ class _SellerTabScreenState extends State<SellerTabScreen> {
       axiscount = 2;
     }
     return Scaffold(
-      
+       appBar: AppBar(
+        title: Text(maintitle),
+      ),
       body: catchList.isEmpty
           ? const Center(
               child: Text("No Data"),
@@ -77,6 +80,18 @@ class _SellerTabScreenState extends State<SellerTabScreen> {
                               onLongPress: () {
                                 onDeleteDialog(index);
                               },
+                                onTap: () async {
+                                   Catch singlecatch =
+                                    Catch.fromJson(catchList[index].toJson());
+                                await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (content) => EditCatchScreen(
+                                              user: widget.user,
+                                              usercatch: singlecatch,
+                                            )));
+                                loadsellerCatches();
+                                },
                               child: Column(children: [
                                 CachedNetworkImage(
                                   width: screenWidth,

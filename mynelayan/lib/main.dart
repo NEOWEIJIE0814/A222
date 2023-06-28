@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mynelayan/screens/color_schemes.g.dart';
 import 'package:mynelayan/splashscreen.dart';
+import 'color_schemes.g.dart';
 
 
 void main() => runApp(const MyApp());

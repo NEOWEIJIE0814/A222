@@ -29,7 +29,7 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     print("Buyer");
     tabchildren = [
-      BuyerTabScreen(), // (user: widget.user) to pass user class to other screen 
+      BuyerTabScreen(user: widget.user), // (user: widget.user) to pass user class to other screen 
       SellerTabScreen(user: widget.user),
       ProfileTabScreen(user: widget.user),
       NewsTabScreen()
@@ -45,7 +45,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(maintitle)),
+      
       body: tabchildren[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
           onTap: onTabTapped,
