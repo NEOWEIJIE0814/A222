@@ -1,38 +1,39 @@
-
 import 'package:barterit/model/user.dart';
 import 'package:barterit/screen/owneritemscreen.dart';
 import 'package:barterit/screen/loginscreen.dart';
-import 'package:barterit/screen/registerscreen.dart';
+import 'package:barterit/screen/profiletab.dart';
 import 'package:flutter/material.dart';
 
-import 'mainscreen.dart';
+import 'barterscreen.dart';
 
 class ControlScreen extends StatefulWidget {
   final User user;
-  const ControlScreen({super.key,required this.user});
+  const ControlScreen({super.key, required this.user});
 
   @override
   State<ControlScreen> createState() => _ControlScreenState();
 }
 
 class _ControlScreenState extends State<ControlScreen> {
-  late List<Widget> tabchildren; 
+  late List<Widget> tabchildren;
   int _currentIndex = 0;
-  String maintitle = "Main";
+  String maintitle = "Barter";
 
   @override
   void initState() {
     super.initState();
-   //\print(widget.user.name);
-    print("Mainscreen");
+    //\print(widget.user.name);
+    print("Barterscreen");
     tabchildren = [
-      MainScreen(),
+      BarterScreen(
+        user: widget.user,
+      ),
       OwnerItemScreen(user: widget.user),
       LoginScreen(user: widget.user),
-      RegisterScreen(user: widget.user),
+      ProfileTab(user: widget.user),
     ];
   }
-  
+
   @override
   void dispose() {
     super.dispose();
@@ -41,7 +42,9 @@ class _ControlScreenState extends State<ControlScreen> {
 
   @override
   Widget build(BuildContext context) {
+   
     return Scaffold(
+     
       body: tabchildren[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
           onTap: onTabTapped,
@@ -50,14 +53,14 @@ class _ControlScreenState extends State<ControlScreen> {
           items: const [
             BottomNavigationBarItem(
                 icon: Icon(
-                  Icons.home,
+                  Icons.swap_horiz,
                 ),
-                label: "Main"),
+                label: "Barter"),
             BottomNavigationBarItem(
                 icon: Icon(
                   Icons.card_giftcard_outlined,
                 ),
-                label: "Owner"),    
+                label: "Owner"),
             BottomNavigationBarItem(
                 icon: Icon(
                   Icons.door_front_door,
@@ -67,8 +70,7 @@ class _ControlScreenState extends State<ControlScreen> {
                 icon: Icon(
                   Icons.person,
                 ),
-                label: "Register"),
-            
+                label: "Profile"),
           ]),
     );
   }
@@ -77,7 +79,7 @@ class _ControlScreenState extends State<ControlScreen> {
     setState(() {
       _currentIndex = value;
       if (_currentIndex == 0) {
-        maintitle = "Main";
+        maintitle = "Barter";
       }
       if (_currentIndex == 1) {
         maintitle = "Owner";
@@ -86,9 +88,8 @@ class _ControlScreenState extends State<ControlScreen> {
         maintitle = "Login";
       }
       if (_currentIndex == 3) {
-        maintitle = "Register";
+        maintitle = "Profile";
       }
-      
     });
   }
 }

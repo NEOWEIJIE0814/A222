@@ -67,10 +67,11 @@ class _OwnerItemScreenState extends State<OwnerItemScreen> {
               children: [
                 Container(
                   height: 24,
+                   color: Theme.of(context).colorScheme.inversePrimary,
                   alignment: Alignment.center,
                   child: Text(
                     "${itemList.length} item Found",
-                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                    style: const TextStyle(color: Colors.black, fontSize: 18),
                   ),
                 ),
                 Expanded(
@@ -80,7 +81,7 @@ class _OwnerItemScreenState extends State<OwnerItemScreen> {
                     return Card(
                       child: InkWell(
                         onLongPress: () {
-                          // onDeleteDialog(index);
+                           onDeleteDialog(index);
                         },
                         onTap: () {
                           loadOwneritem();
@@ -98,12 +99,17 @@ class _OwnerItemScreenState extends State<OwnerItemScreen> {
                               ),
                               Text(
                                   itemList[index].itemName.toString(),
-                                  style: const TextStyle(fontSize: 20),
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                                 
                                 Text(
-                                  itemList[index].itemDesc.toString(),
-                                  style: const TextStyle(fontSize: 16),
+                                  
+                                  "RM ${double.parse(itemList[index].itemPrice.toString()).toStringAsFixed(2)}"
+                                  ,style: const TextStyle(fontSize: 14),
+                                ),
+                                Text(
+                                  "${itemList[index].itemQty} available",
+                                  style: const TextStyle(fontSize: 14),
                                 ),
                           ],
                         ),
@@ -146,7 +152,7 @@ class _OwnerItemScreenState extends State<OwnerItemScreen> {
     }
 
     http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/load_item.php"),
-        body: {"user_id": widget.user.id}).then((response) {
+        body: {"userid": widget.user.id}).then((response) {
       //print(response.body);
       log(response.body);
       itemList.clear();
@@ -160,6 +166,67 @@ class _OwnerItemScreenState extends State<OwnerItemScreen> {
           print(itemList[0].itemName);
         }
         setState(() {});
+      }
+    });
+  }
+  
+  void onDeleteDialog(int index) {
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          title: Text(
+            "Delete ${itemList[index].itemName}?",
+          ),
+          content: const Text("Are you sure?", style: TextStyle()),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                "Yes",
+                style: TextStyle(),
+              ),
+              onPressed: () {
+                deleteCatch(index);
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                "No",
+                style: TextStyle(),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
+  void deleteCatch(int index) {
+    
+    http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/delete_item.php"),
+        body: {
+          "userid": widget.user.id,
+          "itemid": itemList[index].itemId
+        }).then((response) {
+      print(response.body);
+      //catchList.clear();
+      if (response.statusCode == 200) {
+        var jsondata = jsonDecode(response.body);
+        if (jsondata['status'] == "success") {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Delete Success")));
+          loadOwneritem();
+        } else {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Failed")));
+        }
       }
     });
   }

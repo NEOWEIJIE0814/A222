@@ -10,6 +10,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      
       title: 'BarterIt App',
       theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
       home: const SplashScreen(),

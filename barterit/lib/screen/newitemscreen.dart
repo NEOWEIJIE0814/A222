@@ -13,6 +13,7 @@ import 'package:geolocator/geolocator.dart';
 class NewItemScreen extends StatefulWidget {
   final User user;
   const NewItemScreen({super.key, required this.user});
+  
 
   @override
   State<NewItemScreen> createState() => _NewItemScreenState();
@@ -32,6 +33,10 @@ class _NewItemScreenState extends State<NewItemScreen> {
       TextEditingController();
   final TextEditingController _itemdescEditingController =
       TextEditingController();
+  final TextEditingController _itempriceEditingController =
+      TextEditingController();
+  final TextEditingController _itemqtyEditingController =
+      TextEditingController();
   final TextEditingController _prstateEditingController =
       TextEditingController();
   final TextEditingController _prlocalEditingController =
@@ -49,6 +54,11 @@ class _NewItemScreenState extends State<NewItemScreen> {
     _determinePosition();
   }
 
+    @override
+    void dispose() {
+      super.dispose();
+      print("dispose");
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +146,45 @@ class _NewItemScreenState extends State<NewItemScreen> {
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(width: 2.0),
                                   ))),
+                                  Row(
+                      children: [
+                        Flexible(
+                          flex: 5,
+                          child: TextFormField(
+                              textInputAction: TextInputAction.next,
+                              validator: (val) => val!.isEmpty
+                                  ? "Barter price must contain value"
+                                  : null,
+                              onFieldSubmitted: (v) {},
+                              controller: _itempriceEditingController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                  labelText: 'Item Price',
+                                  labelStyle: TextStyle(),
+                                  icon: Icon(Icons.money),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(width: 2.0),
+                                  ))),
+                        ),
+                        Flexible(
+                          flex: 5,
+                          child: TextFormField(
+                              textInputAction: TextInputAction.next,
+                              validator: (val) => val!.isEmpty
+                                  ? "Quantity should be more than 0"
+                                  : null,
+                              controller: _itemqtyEditingController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                  labelText: 'Item Quantity',
+                                  labelStyle: TextStyle(),
+                                  icon: Icon(Icons.numbers),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(width: 2.0),
+                                  ))),
+                        ),
+                      ],
+                    ),
                           Row(children: [
                             Flexible(
                               flex: 5,
@@ -299,6 +348,8 @@ class _NewItemScreenState extends State<NewItemScreen> {
   void insertItem(int counter) {
     String itemname = _itemnameEditingController.text;
     String itemdesc = _itemdescEditingController.text;
+    String itemprice = _itempriceEditingController.text;
+    String itemqty = _itemqtyEditingController.text;
     String state = _prstateEditingController.text;
     String locality = _prlocalEditingController.text;
     String base64Image1 = base64Encode(_image[0]!.readAsBytesSync());
@@ -311,6 +362,8 @@ class _NewItemScreenState extends State<NewItemScreen> {
           "userid": widget.user.id.toString(),
           "itemname": itemname,
           "itemdesc": itemdesc,
+          "itemprice": itemprice,
+          "itemqty": itemqty,
           "latitude": prlat,
           "longitude": prlong,
           "state": state,
