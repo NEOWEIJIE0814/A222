@@ -10,6 +10,8 @@ include_once("dbconnect.php");
 $userid = $_POST['userid'];
 $item_name = $_POST['itemname'];
 $item_desc = $_POST['itemdesc'];
+$item_price = $_POST['itemprice'];
+$item_qty = $_POST['itemqty'];
 $latitude = $_POST['latitude'];
 $longitude = $_POST['longitude'];
 $state = $_POST['state'];
@@ -19,7 +21,7 @@ $image2 = $_POST['image2'];
 $image3 = $_POST['image3'];
 
 
-$sqlinsert = "INSERT INTO `tbl_items`(`user_id`,`item_name`, `item_desc`,  `item_lat`, `item_long`, `item_state`, `item_locality`) VALUES ('$userid','$item_name','$item_desc','$latitude','$longitude','$state','$locality')";
+$sqlinsert = "INSERT INTO `tbl_items`(`user_id`,`item_name`, `item_desc`, `item_price`,`item_qty`, `item_lat`, `item_long`, `item_state`, `item_locality`) VALUES ('$userid','$item_name','$item_desc','$item_price','$item_qty','$latitude','$longitude','$state','$locality')";
 
 
 if ($conn->query($sqlinsert) === TRUE) {

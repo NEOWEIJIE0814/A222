@@ -7,19 +7,38 @@ if (!isset($_POST)) {
 
 include_once("dbconnect.php");
 
+$results_per_page = 10;
+if (isset($_POST['pageno'])){
+	$pageno = (int)$_POST['pageno'];
+}else{
+	$pageno = 1;
+}
+$page_first_result = ($pageno - 1) * $results_per_page;
+
+if (isset($_POST['cartuserid'])){
+	$cartuserid = $_POST['cartuserid'];
+}else{
+	$cartuserid = '0';
+}
+
 if (isset($_POST['userid'])){
 	$userid = $_POST['userid'];	
-	$sqlloadcatches = "SELECT * FROM `tbl_items` WHERE user_id = '$userid'";
-}if (isset($_POST['search'])){
+	$sqlloaditem = "SELECT * FROM `tbl_items` WHERE user_id = '$userid'";
+}else if (isset($_POST['search'])){
 	$search = $_POST['search'];
-	$sqlloadcatches = "SELECT * FROM `tbl_items` WHERE item_name LIKE '%$search%'";
+	$sqlloaditem = "SELECT * FROM `tbl_items` WHERE item_name LIKE '%$search%'";
 }else{
-	$sqlloadcatches = "SELECT * FROM `tbl_items`";
+	$sqlloaditem = "SELECT * FROM `tbl_items`";
 }
 
 
+$result = $conn->query($sqlloaditem);
+$number_of_result = $result->num_rows;
+$number_of_page = ceil($number_of_result / $results_per_page);
+$sqlloaditem = $sqlloaditem . " LIMIT $page_first_result , $results_per_page";
+$result = $conn->query($sqlloaditem);
 
-$result = $conn->query($sqlloadcatches);
+
 if ($result->num_rows > 0) {
     $item["item"] = array();
 	while ($row = $result->fetch_assoc()) {
@@ -28,6 +47,8 @@ if ($result->num_rows > 0) {
         $itemlist['user_id'] = $row['user_id'];
         $itemlist['item_name'] = $row['item_name'];
         $itemlist['item_desc'] = $row['item_desc'];
+		$itemlist['item_price'] = $row['item_price'];
+        $itemlist['item_qty'] = $row['item_qty'];
         $itemlist['item_lat'] = $row['item_lat'];
         $itemlist['item_long'] = $row['item_long'];
         $itemlist['item_state'] = $row['item_state'];
@@ -35,7 +56,7 @@ if ($result->num_rows > 0) {
 		$itemlist['item_date'] = $row['item_date'];
         array_push($item["item"],$itemlist);
     }
-    $response = array('status' => 'success', 'data' => $item);
+    $response = array('status' => 'success', 'data' => $item, 'numofpage'=>"$number_of_page",'numberofresult'=>"$number_of_result",);
     sendJsonResponse($response);
 }else{
      $response = array('status' => 'failed', 'data' => null);

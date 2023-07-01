@@ -20,6 +20,8 @@ class _ProfileTabState extends State<ProfileTab> {
     void initState() {
       super.initState();
       print("Profile");
+      setstate(){
+      }
     }
 
     @override
@@ -27,6 +29,7 @@ class _ProfileTabState extends State<ProfileTab> {
       super.dispose();
       print("dispose");
     }
+
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;

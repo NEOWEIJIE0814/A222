@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../model/item.dart';
 import '../myconfig.dart';
+import 'cartscreen.dart';
 import 'itemdetailscreen.dart';
 
 class BarterScreen extends StatefulWidget {
@@ -63,12 +64,12 @@ class _BarterScreenState extends State<BarterScreen> {
             TextButton.icon(
               onPressed: () {
                 if (itemqty > 0) {
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (content) => BuyerCartScreen(
-                  //               user: widget.user,
-                  //             )));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (content) => CartScreen(
+                                user: widget.user,
+                              )));
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("No item in cart")));
@@ -108,11 +109,11 @@ class _BarterScreenState extends State<BarterScreen> {
                                 Item.fromJson(itemList[index].toJson());
                             await Navigator.push(
                                 context,
-                                MaterialPageRoute(
-                                    builder: (content) => ItemDetailScreen(
-                                          user: widget.user,
-                                          item: useritem,
-                                        )));
+                                  MaterialPageRoute(
+                                      builder: (content) => ItemDetailScreen(
+                                            user: widget.user,
+                                            item: useritem,
+                                          )));
                             loadItem(1);
                           },
                           child: Column(

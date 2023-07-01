@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -266,11 +267,12 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           "item_id": widget.item.itemId.toString(),
           "cart_qty": userqty.toString(),
           "cart_price": totalprice.toString(),
-          "userid": widget.user.id,
-          "barterid": widget.item.userId
+          "userid": widget.user.id.toString(),
+          "barterid": widget.item.userId.toString(),
 
         }).then((response) {
-      print(response.body);
+      log(response.body);
+
       if (response.statusCode == 200) {
         var jsondata = jsonDecode(response.body);
         if (jsondata['status'] == 'success') {
