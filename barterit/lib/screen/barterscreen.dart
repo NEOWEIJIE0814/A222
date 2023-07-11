@@ -26,7 +26,7 @@ class _BarterScreenState extends State<BarterScreen> {
   int numofpage = 1, curpage = 1;
   int numberofresult = 0;
   var color;
-  int itemqty = 0;
+  int cartqty = 0;
 
   TextEditingController searchController = TextEditingController();
   @override
@@ -63,7 +63,7 @@ class _BarterScreenState extends State<BarterScreen> {
                 icon: const Icon(Icons.search)),
             TextButton.icon(
               onPressed: () {
-                if (itemqty > 0) {
+                if (cartqty  > 0) {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -76,7 +76,7 @@ class _BarterScreenState extends State<BarterScreen> {
                 }
               },
               icon: const Icon(Icons.shopping_cart),
-              label: Text(itemqty.toString()),
+              label: Text(cartqty.toString()),
             ),
           ],
         ),
@@ -88,11 +88,11 @@ class _BarterScreenState extends State<BarterScreen> {
                 children: [
                   Container(
                     height: 24,
-                    color: Theme.of(context).colorScheme.inversePrimary,
+                    color: Theme.of(context).colorScheme.primary,
                     alignment: Alignment.center,
                     child: Text(
                       "$numberofresult Item Found",
-                      style: const TextStyle(color: Colors.black, fontSize: 18),
+                      style: const TextStyle(color: Colors.white, fontSize: 18),
                     ),
                   ),
                   Expanded(
@@ -193,8 +193,8 @@ class _BarterScreenState extends State<BarterScreen> {
           numberofresult = int.parse(jsondata['numberofresult']);
           print(numberofresult);
           var extractdata = jsondata['data'];
-          // itemqty = int.parse(jsondata['item_qty'].toString());
-          // print(itemqty);
+           cartqty  = int.parse(jsondata['cartqty'].toString());
+           print(cartqty);
           extractdata['item'].forEach((v) {
             itemList.add(Item.fromJson(v));
           });

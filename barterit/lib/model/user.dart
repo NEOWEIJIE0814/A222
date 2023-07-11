@@ -5,6 +5,8 @@ class User {
   String? password;
   String? otp;
   String? datereg;
+  String? phone;
+  String? token;
 
   User(
       {this.id,
@@ -12,7 +14,10 @@ class User {
       this.name,
       this.password,
       this.otp,
-      this.datereg});
+      this.datereg,
+      this.phone,
+      this.token,
+      });
 
   User.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -21,6 +26,8 @@ class User {
     password = json['password'];
     otp = json['otp'];
     datereg = json['datereg'];
+    phone = json['phone'];
+    token = json['token'];
   }
 
   Map<String, dynamic> toJson() {
@@ -31,6 +38,8 @@ class User {
     data['password'] = password;
     data['otp'] = otp;
     data['datereg'] = datereg;
+    data['phone']= phone;
+    data['token'] = token;
     return data;
   }
 }

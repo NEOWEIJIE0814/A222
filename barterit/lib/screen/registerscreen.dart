@@ -17,6 +17,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   
   final TextEditingController _nameEditingController = TextEditingController();
   final TextEditingController _emailEditingController = TextEditingController();
+   final TextEditingController _phoneEditingController = TextEditingController();
   final TextEditingController _passEditingController = TextEditingController();
   final TextEditingController _pass2EditingController = TextEditingController();
   bool _isChecked = false;
@@ -71,6 +72,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   focusedBorder: OutlineInputBorder(
                                       borderSide: BorderSide(width: 2.0))),
                             ),
+                             TextFormField(
+                          keyboardType: TextInputType.phone,
+                          validator: (val) => val!.isEmpty || (val.length < 10)
+                              ? "phone must be longer or equal than 10"
+                              : null,
+                          controller: _phoneEditingController,
+                          decoration: const InputDecoration(
+                              labelText: 'Phone',
+                              labelStyle: TextStyle(),
+                              icon: Icon(Icons.phone),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(width: 2.0),
+                              ))),
                             TextFormField(
                               controller: _emailEditingController,
                               keyboardType: TextInputType.emailAddress,
@@ -221,12 +235,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     String name = _nameEditingController.text;
     String email = _emailEditingController.text;
+    String phone = _phoneEditingController.text;
     String passa = _passEditingController.text;
 
     http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/register.php"),
         body: {
           "name": name,
           "email": email,
+          "phone":phone,
           "password": passa,
         }).then((response) {
           

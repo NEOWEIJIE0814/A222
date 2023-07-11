@@ -137,8 +137,10 @@ class _CartScreenState extends State<CartScreen> {
           cartList.forEach((element) {
             totalprice =
                 totalprice + double.parse(element.cartPrice.toString());
-          });
+          }); 
           //print(catchList[0].catchName);
+        }else{
+          Navigator.of(context).pop();
         }
         setState(() {});
       }

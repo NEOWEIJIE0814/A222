@@ -67,11 +67,11 @@ class _OwnerItemScreenState extends State<OwnerItemScreen> {
               children: [
                 Container(
                   height: 24,
-                   color: Theme.of(context).colorScheme.inversePrimary,
+                   color: Theme.of(context).colorScheme.primary,
                   alignment: Alignment.center,
                   child: Text(
                     "${itemList.length} item Found",
-                    style: const TextStyle(color: Colors.black, fontSize: 18),
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 ),
                 Expanded(
@@ -120,6 +120,7 @@ class _OwnerItemScreenState extends State<OwnerItemScreen> {
               ],
             ),),
       floatingActionButton: FloatingActionButton(
+          
           onPressed: () async {
             
 
@@ -138,7 +139,7 @@ class _OwnerItemScreenState extends State<OwnerItemScreen> {
           },
           child: const Text(
             "+",
-            style: TextStyle(fontSize: 32),
+            style: TextStyle(fontSize: 32, color: Colors.black),
           )),
     );
   }
