@@ -184,7 +184,6 @@ class _LoginScreenState extends State<LoginScreen> {
         body: {
           "email": email,
           "password": pass,
-
         }).then((response){
           print(response.body);
           if (response.statusCode==200){
@@ -196,13 +195,11 @@ class _LoginScreenState extends State<LoginScreen> {
               print(user.email);
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Login Success")));
               // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainScreen(),));
-
             }else{
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Login Failed")));
             }
           }
         }).timeout(const Duration(seconds: 5), onTimeout: (){});
-    
     }on TimeoutException catch (_) {
       print("Time out");
   }}

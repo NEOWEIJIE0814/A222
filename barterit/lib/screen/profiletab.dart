@@ -1,14 +1,20 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+
+import 'package:barterit/screen/registerscreen.dart';
 import 'package:barterit/screen/topuptokenscreen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:barterit/model/user.dart';
-import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import '../model/user.dart';
 import '../myconfig.dart';
 import 'loginscreen.dart';
-import 'registerscreen.dart';
 
 class ProfileTab extends StatefulWidget {
   final User user;
@@ -19,27 +25,54 @@ class ProfileTab extends StatefulWidget {
 }
 
 class _ProfileTabState extends State<ProfileTab> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _oldpasswordController = TextEditingController();
+  final TextEditingController _newpasswordController = TextEditingController();
   late List<Widget> tabchildren;
   String maintitle = "Profile";
-  final df = DateFormat('dd/MM/yyyy');
   late double screenHeight, screenWidth, cardwitdh;
+  File? _image;
+  final df = DateFormat('dd/MM/yyyy');
+  Random random = Random();
+  var val = 50;
+  bool isDisable = false;
+  late String newtoken;
+
+  late User user = User(
+    id: "na",
+    email: "na",
+    name: "na",
+    password: "na",
+    otp: "na",
+    datereg: "na",
+    phone: "na",
+    token: "na",
+  );
+
   @override
   void initState() {
     super.initState();
-    print("Profile");
-    setstate() {}
+    print("initiate profile");
+    _loadNewToken();
   }
 
   @override
   void dispose() {
     super.dispose();
-    print("dispose");
+    if (widget.user.id == "na") {
+      isDisable = true;
+    } else {
+      isDisable = false;
+    }
+    print("dispose profile");
   }
 
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
+    user.token = widget.user.token.toString();
 
     return Scaffold(
       appBar: AppBar(
@@ -54,62 +87,140 @@ class _ProfileTabState extends State<ProfileTab> {
             child: Card(
               child:
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Container(
-                  margin: EdgeInsets.all(4),
-                  width: screenWidth * 0.4,
-                  child: Image.asset(
-                    "assets/images/profile.png",
+                GestureDetector(
+                  onTap: isDisable
+                      ? null
+                      : () {
+                          _updateImageDialog();
+                        },
+                  child: Container(
+                    margin: const EdgeInsets.all(4),
+                    width: screenWidth * 0.4,
+                    child: CachedNetworkImage(
+                        imageUrl:
+                            "${MyConfig().SERVER}/barterit/assets/profileimages/${widget.user.id}.png?v=$val", //need to change
+                        placeholder: (context, url) =>
+                            const LinearProgressIndicator(),
+                        errorWidget: (context, url, error) => const Icon(
+                              Icons.image_not_supported,
+                              size: 128,
+                            )),
                   ),
                 ),
                 Expanded(
                     flex: 6,
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          widget.user.name.toString(),
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.fromLTRB(0, 2, 0, 8),
-                          child: Divider(
-                            color: Colors.blueGrey,
-                            height: 2,
-                            thickness: 2.0,
-                          ),
-                        ),
-                        Table(
-                          columnWidths: const {
-                            0: FractionColumnWidth(0.3),
-                            1: FractionColumnWidth(0.7)
-                          },
-                          defaultVerticalAlignment:
-                              TableCellVerticalAlignment.middle,
-                          children: [
-                            TableRow(children: [
-                              const Icon(Icons.email),
-                              Text(widget.user.email.toString()),
-                            ]),
-                            TableRow(children: [
-                              const Icon(Icons.phone),
-                              Text(widget.user.phone.toString()),
-                            ]),
-                            widget.user.datereg.toString() == ""
-                                ? TableRow(children: [
-                                    const Icon(Icons.date_range),
-                                    Text(df.format(DateTime.parse(
-                                        widget.user.datereg.toString())))
-                                  ])
-                                : TableRow(children: [
-                                    const Icon(Icons.date_range),
-                                    Text(df.format(DateTime.parse(
-                                        widget.user.datereg.toString())))
-                                  ]),
-                            TableRow(children: [
-                              const Icon(Icons.monetization_on),
-                              Text(widget.user.token.toString()),
-                            ]),
-                          ],
-                        ),
+                        widget.user.name.toString() == "na"
+                            ? Column(
+                                children: [
+                                  const Text(
+                                    "Not Available",
+                                    style: TextStyle(fontSize: 24),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 2, 0, 8),
+                                    child: Divider(
+                                      color: Colors.blueGrey,
+                                      height: 2,
+                                      thickness: 2.0,
+                                    ),
+                                  ),
+                                  Table(
+                                    columnWidths: const {
+                                      0: FractionColumnWidth(0.3),
+                                      1: FractionColumnWidth(0.7)
+                                    },
+                                    defaultVerticalAlignment:
+                                        TableCellVerticalAlignment.middle,
+                                    children: const [
+                                      TableRow(children: [
+                                        Icon(Icons.email),
+                                        Text("Not Available"),
+                                      ]),
+                                      TableRow(children: [
+                                        Icon(Icons.phone),
+                                        Text("Not Available"),
+                                      ]),
+                                      TableRow(children: [
+                                        Icon(Icons.date_range),
+                                        Text("Not Available")
+                                      ]),
+                                      TableRow(children: [
+                                        Icon(Icons.monetization_on),
+                                        Text("Not Available"),
+                                      ]),
+                                    ],
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                children: [
+                                  Text(
+                                    widget.user.name.toString(),
+                                    style: const TextStyle(fontSize: 24),
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 2, 0, 8),
+                                    child: Divider(
+                                      color: Colors.blueGrey,
+                                      height: 2,
+                                      thickness: 2.0,
+                                    ),
+                                  ),
+                                  Table(
+                                    columnWidths: const {
+                                      0: FractionColumnWidth(0.3),
+                                      1: FractionColumnWidth(0.7)
+                                    },
+                                    defaultVerticalAlignment:
+                                        TableCellVerticalAlignment.middle,
+                                    children: [
+                                      TableRow(children: [
+                                        const Icon(Icons.email),
+                                        Text(widget.user.email.toString()),
+                                      ]),
+                                      TableRow(children: [
+                                        const Icon(Icons.phone),
+                                        Text(widget.user.phone.toString()),
+                                      ]),
+                                      widget.user.datereg.toString() == ""
+                                          ? TableRow(children: [
+                                              const Icon(Icons.date_range),
+                                              Text(df.format(DateTime.parse(
+                                                  widget.user.datereg
+                                                      .toString())))
+                                            ])
+                                          : TableRow(children: [
+                                              const Icon(Icons.date_range),
+                                              Text(df.format(DateTime.parse(
+                                                  widget.user.datereg
+                                                      .toString())))
+                                            ]),
+                                      TableRow(children: [
+                                        const Icon(Icons.monetization_on),
+
+                                        Text(widget.user.token
+                                            .toString()), //need to change
+                                      ]),
+                                    ],
+                                  ),
+                                ],
+                              )
+                        // : Column(
+                        //     children: [
+                        //       Text(
+                        //         widget.user.name.toString(),
+                        //         style: const TextStyle(fontSize: 24),
+                        //       ),
+                        //       const Divider(),
+                        //       Text(widget.user.email.toString()),
+                        //       Text(widget.user.phone.toString()),
+                        //       Text(df.format(DateTime.parse(
+                        //           widget.user.datereg.toString()))),
+                        //     ],
+                        //   )
                       ],
                     )),
               ]),
@@ -118,270 +229,263 @@ class _ProfileTabState extends State<ProfileTab> {
           Container(
             width: screenWidth,
             alignment: Alignment.center,
-            child: const Padding(
-              padding: EdgeInsets.fromLTRB(0, 2, 0, 2),
+            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
               child: Text("PROFILE SETTINGS",
                   style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onPrimary,
                   )),
             ),
           ),
-          Container(
-            child: Expanded(
-                child: ListView(
-              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-              shrinkWrap: true,
-              children: [
-                const Divider(
-                  height: 2,
-                ),
-                Card(
-                  elevation: 10,
-                  child: MaterialButton(
-                    onPressed: () => {_updateProfileDialog(1)},
-                    child: const Text(
-                      "CHANGE NAME",
-                      style: TextStyle(color: Colors.black),
-                    ),
+          Expanded(
+              child: ListView(
+            children: [
+              MaterialButton(
+                onPressed: _updateNameDialog,
+                child: const Text("CHANGE NAME"),
+              ),
+              const Divider(),
+              MaterialButton(
+                onPressed: () {
+                  _updatePhoneDialog();
+                },
+                child: const Text("CHANGE PHONE"),
+              ),
+              const Divider(),
+              MaterialButton(
+                onPressed: () {
+                  _changePassDialog();
+                },
+                child: const Text("CHANGE PASSWORD"),
+              ),
+              const Divider(),
+              MaterialButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (content) =>
+                              LoginScreen(user: widget.user)));
+                },
+                child: const Text("LOGIN"),
+              ),
+              const Divider(),
+              MaterialButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (content) =>
+                              RegisterScreen(user: widget.user)));
+                },
+                child: const Text("REGISTRATION"),
+              ),
+              const Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.monetization_on,
                   ),
-                ),
-                Card(
-                  elevation: 10,
-                  child: MaterialButton(
-                    onPressed: () => {_updateProfileDialog(2)},
-                    child: const Text("CHANGE PHONE",
-                        style: TextStyle(color: Colors.black)),
-                  ),
-                ),
-                Card(
-                  elevation: 10,
-                  child: MaterialButton(
-                    onPressed: () => {_updateProfileDialog(3)},
-                    child: const Text("CHANGE PASSWORD",
-                        style: TextStyle(color: Colors.black)),
-                  ),
-                ),
-                Card(
-                  elevation: 10,
-                  child: MaterialButton(
-                    onPressed: () {
-                      Navigator.push(
+                  MaterialButton(
+                    onPressed: () async {
+                      await Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (content) =>
-                                  LoginScreen(user: widget.user)));
+                              builder: (BuildContext context) =>
+                                  TopUpTokenScreen(
+                                    user: widget.user,
+                                  ))); //need to change router to payment
+                      _loadNewToken(); // do the function
                     },
-                    child: const Text("LOGIN",
+                    child: const Text("TOP UP BARTER TOKEN",
                         style: TextStyle(color: Colors.black)),
                   ),
-                ),
-                Card(
-                  elevation: 10,
-                  child: MaterialButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (content) =>
-                                  RegisterScreen(user: widget.user)));
-                    },
-                    child: const Text("REGISTRATION",
-                        style: TextStyle(color: Colors.black)),
-                  ),
-                ),
-                Card(
-                  elevation: 10,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.monetization_on,
-                      ),
-                      MaterialButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (content) => TopUpTokenScreen(
-                                      user: widget.user,
-                                      
-                                      ))); //need to change router to payment
-                          _loadNewCredit(); // do the function
-                        },
-                        child: const Text("TOP UP BARTER TOKEN",
-                            style: TextStyle(color: Colors.black)),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            )),
-          ),
+                ],
+              ),
+            ],
+          ))
         ]),
       ),
     );
   }
 
-  _updateProfileDialog(int i) {
-    switch (i) {
-      case 1:
-        _updateNameDialog();
-        break;
-      case 2:
-        _updatePhoneDialog();
-        break;
-      case 3:
-        _updatePasswordDialog();
-        break;
+  _updateImageDialog() {
+    if (widget.user.id == "0") {
+      Fluttertoast.showToast(
+          msg: "Please login/register",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          fontSize: 16.0);
+      return;
     }
-  }
-
-  void _updateNameDialog() {
-    TextEditingController _nameEditingController = TextEditingController();
-    _nameEditingController.text = widget.user.name.toString();
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        // return object of type Dialog
         return AlertDialog(
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0))),
-          title: const Text(
-            "Name",
-            style: TextStyle(),
-          ),
-          content: TextField(
-              controller: _nameEditingController,
-              keyboardType: TextInputType.phone),
-          actions: <Widget>[
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              TextButton(
-                child: const Text(
-                  "Confirm",
-                  style: TextStyle(),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  http.post(
-                      Uri.parse(
-                          "${MyConfig().SERVER}/barterit/php/update_profile.php"), // Need to change
-                      body: {
-                        "name": _nameEditingController.text,
-                        "userid": widget.user.id
-                      }).then((response) {
-                    var data = jsonDecode(response.body);
-                    //  print(data);
-                    if (response.statusCode == 200 &&
-                        data['status'] == 'success') {
-                      Fluttertoast.showToast(
-                          msg: "Success",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          textColor: Colors.green,
-                          fontSize: 14.0);
-                      setState(() {
-                        widget.user.name = _nameEditingController.text;
-                      });
-                    } else {
-                      Fluttertoast.showToast(
-                          msg: "Failed",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          timeInSecForIosWeb: 1,
-                          textColor: Colors.red,
-                          fontSize: 14.0);
-                    }
-                  });
-                },
-              ),
-              TextButton(
-                child: const Text(
-                  "Cancel",
-                  style: TextStyle(),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ]),
-          ],
-        );
+            title: const Text(
+              "Select from",
+            ),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                TextButton.icon(
+                    onPressed: () => {
+                          Navigator.of(context).pop(),
+                          _galleryPicker(),
+                        },
+                    icon: const Icon(Icons.browse_gallery),
+                    label: const Text("Gallery")),
+                TextButton.icon(
+                    onPressed: () =>
+                        {Navigator.of(context).pop(), _cameraPicker()},
+                    icon: const Icon(Icons.camera_alt),
+                    label: const Text("Camera")),
+              ],
+            ));
       },
     );
   }
 
-  void _updatePhoneDialog() {
-    TextEditingController _phoneEditingController = TextEditingController();
-    _phoneEditingController.text = widget.user.phone.toString();
+  _galleryPicker() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxHeight: 800,
+      maxWidth: 800,
+    );
+    if (pickedFile != null) {
+      _image = File(pickedFile.path);
+      cropImage();
+    }
+  }
+
+  _cameraPicker() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.camera,
+      maxHeight: 800,
+      maxWidth: 800,
+    );
+    if (pickedFile != null) {
+      _image = File(pickedFile.path);
+      cropImage();
+    }
+  }
+
+  Future<void> cropImage() async {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: _image!.path,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.square,
+      ],
+      uiSettings: [
+        AndroidUiSettings(
+            toolbarTitle: 'Cropper',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        IOSUiSettings(
+          title: 'Cropper',
+        ),
+      ],
+    );
+    if (croppedFile != null) {
+      File imageFile = File(croppedFile.path);
+      _image = imageFile;
+      _updateProfileImage(_image);
+    }
+  }
+
+  void _updateProfileImage(image) {
+    String base64Image = base64Encode(image!.readAsBytesSync());
+
+    http.post(
+        Uri.parse(
+            "${MyConfig().SERVER}/barterit/php/update_profile.php"), // need to change
+        body: {
+          "userid": widget.user.id,
+          "image": base64Image,
+        }).then((response) {
+      var jsondata = jsonDecode(response.body);
+      if (response.statusCode == 200 && jsondata['status'] == 'success') {
+        Fluttertoast.showToast(
+            msg: "Success",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+        val = random.nextInt(1000);
+        setState(() {});
+        // DefaultCacheManager manager = DefaultCacheManager();
+        // manager.emptyCache(); //clears all data in cache.
+      } else {
+        Fluttertoast.showToast(
+            msg: "Failed",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+      }
+    });
+  }
+
+  void _updateNameDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        // return object of type Dialog
         return AlertDialog(
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(20.0))),
           title: const Text(
-            "Phone Number",
+            "Change Name?",
             style: TextStyle(),
           ),
-          content: TextField(
-              controller: _phoneEditingController,
-              keyboardType: TextInputType.phone),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                    labelText: 'Name',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0))),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your name';
+                  }
+                  return null;
+                },
+              ),
+            ],
+          ),
           actions: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  child: const Text(
-                    "Confirm",
-                    style: TextStyle(),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    http.post(
-                        Uri.parse(
-                            "${MyConfig().SERVER}/barterit/php/update_profile.php"), // Need to change
-                        body: {
-                          "phone": _phoneEditingController.text,
-                          "userid": widget.user.id
-                        }).then((response) {
-                      var data = jsonDecode(response.body);
-                      // print(data);
-                      if (response.statusCode == 200 &&
-                          data['status'] == 'success') {
-                        Fluttertoast.showToast(
-                            msg: "Success",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            textColor: Colors.green,
-                            fontSize: 14.0);
-                        setState(() {
-                          widget.user.phone = _phoneEditingController.text;
-                        });
-                      } else {
-                        Fluttertoast.showToast(
-                            msg: "Failed",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            textColor: Colors.red,
-                            fontSize: 14.0);
-                      }
-                    });
-                  },
-                ),
-                TextButton(
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
+            TextButton(
+              child: const Text(
+                "Yes",
+                style: TextStyle(),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                String newname = _nameController.text;
+                _updateName(newname);
+              },
+            ),
+            TextButton(
+              child: const Text(
+                "No",
+                style: TextStyle(),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
             ),
           ],
         );
@@ -389,115 +493,82 @@ class _ProfileTabState extends State<ProfileTab> {
     );
   }
 
-  void _updatePasswordDialog() {
-    TextEditingController _pass1editingController = TextEditingController();
-    TextEditingController _pass2editingController = TextEditingController();
+  void _updateName(String newname) {
+    http.post(
+        Uri.parse(
+            "${MyConfig().SERVER}/barterit/php/update_profile.php"), // need to change
+        body: {
+          "userid": widget.user.id,
+          "newname": newname,
+        }).then((response) {
+      var jsondata = jsonDecode(response.body);
+      if (response.statusCode == 200 && jsondata['status'] == 'success') {
+        Fluttertoast.showToast(
+            msg: "Success",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+        setState(() {
+          widget.user.name = newname;
+        });
+      } else {
+        Fluttertoast.showToast(
+            msg: "Failed",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+      }
+    });
+  }
+
+  void _updatePhoneDialog() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        // return object of type Dialog
         return AlertDialog(
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0))),
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
           title: const Text(
-            "Update Password",
+            "Change Phone?",
             style: TextStyle(),
           ),
-          content: SizedBox(
-            height: screenHeight / 5,
-            child: Column(
-              children: [
-                TextField(
-                    controller: _pass1editingController,
-                    keyboardType: TextInputType.text,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                        labelText: 'New password',
-                        labelStyle: TextStyle(),
-                        icon: Icon(
-                          Icons.password,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(width: 2.0),
-                        ))),
-                TextField(
-                    controller: _pass2editingController,
-                    keyboardType: TextInputType.text,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                        labelText: 'Renter password',
-                        labelStyle: TextStyle(),
-                        icon: Icon(
-                          Icons.password,
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(width: 2.0),
-                        ))),
-              ],
-            ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _phoneController,
+                keyboardType: const TextInputType.numberWithOptions(),
+                decoration: InputDecoration(
+                    labelText: 'Phone',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0))),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter new your phone';
+                  }
+                  return null;
+                },
+              ),
+            ],
           ),
           actions: <Widget>[
             TextButton(
               child: const Text(
-                "Confirm",
+                "Yes",
                 style: TextStyle(),
               ),
               onPressed: () {
-                if (_pass1editingController.text !=
-                    _pass2editingController.text) {
-                  Fluttertoast.showToast(
-                      msg: "Passwords are not the same",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      textColor: Colors.red,
-                      fontSize: 14.0);
-                  return;
-                }
-                if (_pass1editingController.text.isEmpty ||
-                    _pass2editingController.text.isEmpty) {
-                  Fluttertoast.showToast(
-                      msg: "Fill in passwords",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 1,
-                      textColor: Colors.red,
-                      fontSize: 14.0);
-                  return;
-                }
                 Navigator.of(context).pop();
-                http.post(
-                    Uri.parse(
-                        "${MyConfig().SERVER}/barterit/php/update_profile.php"), // Need to change
-                    body: {
-                      "password": _pass1editingController.text,
-                      "userid": widget.user.id
-                    }).then((response) {
-                  var data = jsonDecode(response.body);
-                  //  print(data);
-                  if (response.statusCode == 200 &&
-                      data['status'] == 'success') {
-                    Fluttertoast.showToast(
-                        msg: "Success",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        textColor: Colors.green,
-                        fontSize: 14.0);
-                  } else {
-                    Fluttertoast.showToast(
-                        msg: "Failed",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                        textColor: Colors.red,
-                        fontSize: 14.0);
-                  }
-                });
+                String newphone = _phoneController.text;
+                _updatePhone(newphone);
               },
             ),
             TextButton(
               child: const Text(
-                "Cancel",
+                "No",
                 style: TextStyle(),
               ),
               onPressed: () {
@@ -510,5 +581,143 @@ class _ProfileTabState extends State<ProfileTab> {
     );
   }
 
-  void _loadNewCredit() {}
+  void _updatePhone(String newphone) {
+    http.post(
+        Uri.parse(
+            "${MyConfig().SERVER}/barterit/php/update_profile.php"), // need to change
+        body: {
+          "userid": widget.user.id,
+          "newphone": newphone,
+        }).then((response) {
+      var jsondata = jsonDecode(response.body);
+      if (response.statusCode == 200 && jsondata['status'] == 'success') {
+        Fluttertoast.showToast(
+            msg: "Success",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+        setState(() {
+          widget.user.phone = newphone;
+        });
+      } else {
+        Fluttertoast.showToast(
+            msg: "Failed",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+      }
+    });
+  }
+
+  void _changePassDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
+          title: const Text(
+            "Change Password?",
+            style: TextStyle(),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _oldpasswordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                    labelText: 'Old Password',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0))),
+              ),
+              const SizedBox(height: 5),
+              TextFormField(
+                controller: _newpasswordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                    labelText: 'New Password',
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0))),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                "Yes",
+                style: TextStyle(),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                changePass();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                "No",
+                style: TextStyle(),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void changePass() {
+    http.post(
+        Uri.parse(
+            "${MyConfig().SERVER}/barterit/php/update_profile.php"), // need to change
+        body: {
+          "userid": widget.user.id,
+          "oldpass": _oldpasswordController.text,
+          "newpass": _newpasswordController.text,
+        }).then((response) {
+      var jsondata = jsonDecode(response.body);
+      if (response.statusCode == 200 && jsondata['status'] == 'success') {
+        Fluttertoast.showToast(
+            msg: "Success",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+        setState(() {});
+      } else {
+        Fluttertoast.showToast(
+            msg: "Failed",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            fontSize: 16.0);
+      }
+    });
+  }
+
+  void _loadNewToken() async {
+    await http.post(
+        Uri.parse(
+            "${MyConfig().SERVER}/barterit/php/load_user.php"), //loaduser need to change
+        body: {
+          "userid": widget.user.id,
+        }).then((response) {
+      //  print(response.body);
+      if (response.statusCode == 200) {
+        var jsondata = jsonDecode(response.body);
+
+        if (jsondata['status'] == 'success') {
+          user = User.fromJson(jsondata['data']);
+
+          setState(() {});
+        }
+      }
+    });
+    widget.user.token = user.token;
+  }
 }

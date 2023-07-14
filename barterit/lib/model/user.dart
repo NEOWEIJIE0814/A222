@@ -16,8 +16,7 @@ class User {
       this.otp,
       this.datereg,
       this.phone,
-      this.token,
-      });
+      this.token});
 
   User.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -31,14 +30,14 @@ class User {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
+  final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['email'] = email;
     data['name'] = name;
     data['password'] = password;
     data['otp'] = otp;
     data['datereg'] = datereg;
-    data['phone']= phone;
+    data['phone'] = phone;
     data['token'] = token;
     return data;
   }

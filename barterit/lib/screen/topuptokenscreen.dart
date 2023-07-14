@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -10,7 +11,10 @@ import 'billscreen.dart';
 
 class TopUpTokenScreen extends StatefulWidget {
   final User user;
-  const TopUpTokenScreen({super.key, required this.user,});
+  const TopUpTokenScreen({
+    super.key,
+    required this.user,
+  });
 
   @override
   State<TopUpTokenScreen> createState() => _TopUpTokenScreenState();
@@ -23,6 +27,28 @@ class _TopUpTokenScreenState extends State<TopUpTokenScreen> {
   List<String> creditType = ["5", "10", "15", "20", "25", "50", "100", "1000"];
   String selectedValue = "5";
   double price = 0.0;
+  late User user = User(
+    id: "na",
+    email: "na",
+    name: "na",
+    password: "na",
+    otp: "na",
+    datereg: "na",
+    phone: "na",
+    token: "na",
+  );
+
+  @override
+  void initState() {
+    super.initState();
+   // _loadNewToken();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    print("dispose");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -177,8 +203,14 @@ class _TopUpTokenScreenState extends State<TopUpTokenScreen> {
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 10),
                         ElevatedButton(
-                          child: const Text("BUY", style: TextStyle(fontSize: 20),),
-                          onPressed: _buyTokenDialog,
+                          child: const Text(
+                            "BUY",
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          onPressed: ()  {
+                             _buyTokenDialog();  
+                                            //pop current page
+                          },
                           style: ElevatedButton.styleFrom(
                               fixedSize: Size(screenWidth / 2, 50)),
                         ),
@@ -192,8 +224,8 @@ class _TopUpTokenScreenState extends State<TopUpTokenScreen> {
     );
   }
 
-  void _buyTokenDialog() {
-    showDialog(
+  Future<void>  _buyTokenDialog() async{
+  await  showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -207,7 +239,6 @@ class _TopUpTokenScreenState extends State<TopUpTokenScreen> {
           ),
           content: const Text("Are you sure?", style: TextStyle(fontSize: 16)),
           actions: <Widget>[
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -217,47 +248,54 @@ class _TopUpTokenScreenState extends State<TopUpTokenScreen> {
                     style: TextStyle(),
                   ),
                   onPressed: () async {
-                Navigator.of(context).pop();
+                    Navigator.of(context).pop();
                     await Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (BuildContext context) => BillScreen(
                                   user: widget.user,
-                                   token: int.parse(selectedValue),            //#need to add
-                                   usertoken: widget.user.token.toString(),
+                                  token: int.parse(selectedValue), //#need to add
+                                  usertoken: widget.user.token.toString(),
                                 )));
-                     _loadNewToken();
+                    _loadNewToken();
                   },
                 ),
-              
-            TextButton(
-              child: const Text(
-                "No",
-                style: TextStyle(),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ],
+                TextButton(
+                  child: const Text(
+                    "No",
+                    style: TextStyle(),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
             ),
           ],
         );
       },
     );
   }
-  
-  void _loadNewToken() {
-    http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/update_profile.php"), //loaduser need to change
-        body: {"email": widget.user.email}).then((response) {
-      if (response.statusCode == 200 && response.body != "failed") {
-        final jsonResponse = json.decode(response.body);
-        //print(response.body);
-        User user = User.fromJson(jsonResponse);
-        setState(() {
-        });
-      }
-    });
-  }
-  }
 
+ _loadNewToken() async {
+  Navigator.of(context).pop();
+  await  http.post(
+        Uri.parse(
+            "${MyConfig().SERVER}/barterit/php/load_user.php"), //loaduser need to change
+        body: {
+          "userid": widget.user.id,
+        }).then((response) {
+      //log(response.body);
+      if (response.statusCode == 200) {
+        var jsondata = jsonDecode(response.body);
+        if (jsondata['status'] == 'success') {
+          user = User.fromJson(jsondata['data']);
+          
+          setState(() {});
+        }
+      }
+      widget.user.token = user.token;
+    });
+   
+  }
+}
