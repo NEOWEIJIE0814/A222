@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
@@ -219,9 +220,21 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   }
   
   void addtocartdialog() {
-     if (widget.user.id.toString() == widget.item.userId.toString()) {
+    
+     if (widget.user.id.toString() == "na") {                           // unregister user cannot add
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("User cannot add own item")));
+          const SnackBar(content: Text("Please register to add item to cart")));
+      return;
+    }
+    if (widget.user.id.toString() == widget.item.userId.toString()) {
+      Fluttertoast.showToast(
+          msg: "User cannot add own item",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          fontSize: 16.0);
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //     const SnackBar(content: Text("User cannot add own item")));
       return;
     }
     showDialog(

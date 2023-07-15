@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:barterit/screen/registerscreen.dart';
 import 'package:barterit/screen/topuptokenscreen.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -36,7 +36,8 @@ class _ProfileTabState extends State<ProfileTab> {
   final df = DateFormat('dd/MM/yyyy');
   Random random = Random();
   var val = 50;
-  bool isDisable = false;
+  bool isDisable =
+      false; // change from false to true, unregister user cannot edit
   late String newtoken;
 
   late User user = User(
@@ -97,8 +98,9 @@ class _ProfileTabState extends State<ProfileTab> {
                     margin: const EdgeInsets.all(4),
                     width: screenWidth * 0.4,
                     child: CachedNetworkImage(
+                        //need to change
                         imageUrl:
-                            "${MyConfig().SERVER}/barterit/assets/profileimages/${widget.user.id}.png?v=$val", //need to change
+                            "${MyConfig().SERVER}/barterit/assets/profileimages/${widget.user.id}.png?v=$val",
                         placeholder: (context, url) =>
                             const LinearProgressIndicator(),
                         errorWidget: (context, url, error) => const Icon(
@@ -244,20 +246,49 @@ class _ProfileTabState extends State<ProfileTab> {
               child: ListView(
             children: [
               MaterialButton(
-                onPressed: _updateNameDialog,
+                onPressed: () {
+                  if (widget.user.name.toString() == "na") {
+                    Fluttertoast.showToast(
+                        msg: "Please login/register",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 1,
+                        fontSize: 16.0);
+                  } else {
+                    _updateNameDialog();
+                  }
+                },
                 child: const Text("CHANGE NAME"),
               ),
               const Divider(),
               MaterialButton(
                 onPressed: () {
-                  _updatePhoneDialog();
+                  if (widget.user.name.toString() == "na") {
+                    Fluttertoast.showToast(
+                        msg: "Please login/register",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 1,
+                        fontSize: 16.0);
+                  } else {
+                    _updatePhoneDialog();
+                  }
                 },
                 child: const Text("CHANGE PHONE"),
               ),
               const Divider(),
               MaterialButton(
                 onPressed: () {
-                  _changePassDialog();
+                  if (widget.user.name.toString() == "na") {
+                    Fluttertoast.showToast(
+                        msg: "Please login/register",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 1,
+                        fontSize: 16.0);
+                  } else {
+                    _changePassDialog();
+                  }
                 },
                 child: const Text("CHANGE PASSWORD"),
               ),
@@ -292,13 +323,23 @@ class _ProfileTabState extends State<ProfileTab> {
                   ),
                   MaterialButton(
                     onPressed: () async {
-                      await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  TopUpTokenScreen(
-                                    user: widget.user,
-                                  ))); //need to change router to payment
+                      if (widget.user.name.toString() == "na") {
+                        Fluttertoast.showToast(
+                            msg: "Please login/register",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            fontSize: 16.0);
+                      } else {
+                        await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    TopUpTokenScreen(
+                                      user: widget.user,
+                                    )));
+                      }
+                      //need to change router to payment
                       _loadNewToken(); // do the function
                     },
                     child: const Text("TOP UP BARTER TOKEN",
@@ -314,7 +355,7 @@ class _ProfileTabState extends State<ProfileTab> {
   }
 
   _updateImageDialog() {
-    if (widget.user.id == "0") {
+    if (widget.user.id == "na") {
       Fluttertoast.showToast(
           msg: "Please login/register",
           toastLength: Toast.LENGTH_SHORT,
@@ -719,5 +760,6 @@ class _ProfileTabState extends State<ProfileTab> {
       }
     });
     widget.user.token = user.token;
+    print(widget.user.id);
   }
 }
