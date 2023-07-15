@@ -100,7 +100,7 @@ class _ProfileTabState extends State<ProfileTab> {
                     child: CachedNetworkImage(
                         //need to change
                         imageUrl:
-                            "${MyConfig().SERVER}/barterit/assets/profileimages/${widget.user.id}.png",
+                            "${MyConfig().SERVER}/barterit/assets/profileimages/${widget.user.id}.png?v=$val",
                         placeholder: (context, url) =>
                             const LinearProgressIndicator(),
                         errorWidget: (context, url, error) => const Icon(
