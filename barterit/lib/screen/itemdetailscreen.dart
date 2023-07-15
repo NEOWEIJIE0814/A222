@@ -25,6 +25,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   int userqty = 1;
   double totalprice = 0.0;
   double singleprice = 0.0;
+  int barterfees = 2;
+
   @override
   void initState() {
     super.initState();
@@ -209,7 +211,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
             onPressed: () {
               addtocartdialog();
             },
-            child: const Text("   Add to Cart   "))
+            child: const Text("   Barter item  "))
 
           ],
         ))
@@ -244,10 +246,10 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10.0))),
           title: const Text(
-            "Add to cart?",
+            "Barter the item",
             style: TextStyle(),
           ),
-          content: const Text("Are you sure?", style: TextStyle()),
+          content: const Text("2 token will be deducted for the processing fees. Are you sure? ", style: TextStyle()),
           actions: <Widget>[
             TextButton(
               child: const Text(
@@ -256,6 +258,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               ),
               onPressed: () {
                 Navigator.of(context).pop();
+                deductToken();
                 addtocart();
               },
             ),
@@ -302,5 +305,31 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         Navigator.pop(context);
       }
     });
+  }
+  
+  Future<void> deductToken() async {
+    
+    await http.post(
+        Uri.parse(
+            "${MyConfig().SERVER}/barterit/php/deduct_token.php"), // Need to change
+        body: {
+          "selecttoken": barterfees.toString(),
+          "userid": widget.user.id,
+        }).then((response) {
+      print(response.body);
+      if (response.statusCode == 200) {
+        var jsondata = jsonDecode(response.body);
+
+        if (jsondata['status'] == "success") {
+          //user = User.fromJson(jsondata['data']);   //error
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Payment Success")));
+        } else {
+          ScaffoldMessenger.of(context)
+              .showSnackBar(const SnackBar(content: Text("Payment Fail")));
+        }
+      }
+      setState(() {});
+    }).timeout(const Duration(seconds: 5));
   }
 }
