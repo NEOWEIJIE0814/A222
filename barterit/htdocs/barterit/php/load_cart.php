@@ -6,7 +6,6 @@ if (!isset($_POST)) {
 }
 
 include_once("dbconnect.php");
-//SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate FROM Orders INNER JOIN Customers ON Orders.CustomerID=Customers.CustomerID;
 
 
 if (isset($_POST['userid'])){
@@ -20,10 +19,11 @@ if ($result->num_rows > 0) {
 	while ($row = $result->fetch_assoc()) {
         $cartlist = array();
         $cartlist['cart_id'] = $row['cart_id'];
-        $cartlist['tbl_items'] = $row['tbl_items'];
+        $cartlist['item_id'] = $row['item_id'];
         $cartlist['item_name'] = $row['item_name'];
         $cartlist['item_qty'] = $row['item_qty'];
         $cartlist['cart_price'] = $row['cart_price'];
+		$cartlist['cart_qty'] = $row['cart_qty'];
         $cartlist['user_id'] = $row['user_id'];
         $cartlist['barter_id'] = $row['barter_id'];
         $cartlist['cart_date'] = $row['cart_date'];
