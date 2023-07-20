@@ -33,7 +33,7 @@ class _CartScreenState extends State<CartScreen> {
     screenWidth = MediaQuery.of(context).size.width;
     return  Scaffold(
       appBar: AppBar(
-        title: const Text("Your Cart"),
+        title: const Text("Your Request"),
       ),
       body: Column(
         children: [
@@ -74,16 +74,17 @@ class _CartScreenState extends State<CartScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          IconButton(
-                                              onPressed: () {},
-                                              icon: const Icon(Icons.remove)),
+                                          // IconButton(
+                                          //     onPressed: () {},
+                                          //     icon: const Icon(Icons.remove)),
+                                          const Text("Qty: "),
                                           Text(cartList[index]
                                               .cartQty
                                               .toString()),
-                                          IconButton(
-                                            onPressed: () {},
-                                            icon: const Icon(Icons.add),
-                                          )
+                                          // IconButton(
+                                          //   onPressed: () {},
+                                          //   icon: const Icon(Icons.add),
+                                          // )
                                         ],
                                       ),
                                       Text(
@@ -92,24 +93,23 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 ),
                               ),
-                              IconButton(
-                                  onPressed: () {}, icon: Icon(Icons.delete))
+                              Text(cartList[index].barterStatus.toString(), style: TextStyle(fontWeight:FontWeight.bold ),)
                             ],
                           ),
                         ));
                       })),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-                height: 70,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Total Price RM " + totalprice.toStringAsFixed(2)),
-                    ElevatedButton(onPressed: () {}, child: Text("Check Out"))
-                  ],
-                )),
-          )
+          // Padding(
+          //   padding: const EdgeInsets.all(8.0),
+          //   child: Container(
+          //       height: 70,
+          //       child: Row(
+          //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //         children: [
+          //           Text("Total Price RM " + totalprice.toStringAsFixed(2)),
+          //           ElevatedButton(onPressed: () {}, child: Text("Check Out"))
+          //         ],
+          //       )),
+          // )
         ],
       ),
     );

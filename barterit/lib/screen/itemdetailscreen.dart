@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:barterit/screen/topuptokenscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -26,6 +27,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   double totalprice = 0.0;
   double singleprice = 0.0;
   int barterfees = 2;
+  String status = "Pending";
+  List<Item> itemList = <Item>[];
 
   @override
   void initState() {
@@ -33,6 +36,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     qty = int.parse(widget.item.itemQty.toString());
     totalprice = double.parse(widget.item.itemPrice.toString());
     singleprice = double.parse(widget.item.itemPrice.toString());
+    loadOwneritem();
+
   }
 
   final df = DateFormat('dd-MM-yyyy hh:mm a');
@@ -285,9 +290,10 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           "cart_price": totalprice.toString(),
           "userid": widget.user.id.toString(),
           "barterid": widget.item.userId.toString(),
+          "barter_status": status.toString(),
 
         }).then((response) {
-      log(response.body);
+      //log(response.body);
 
       if (response.statusCode == 200) {
         var jsondata = jsonDecode(response.body);
@@ -308,7 +314,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   }
   
   Future<void> deductToken() async {
-    
+     var numtoken = int.tryParse(widget.user.token.toString());  
+
+    if(numtoken! < 2){
+      _moreToken();
+    }else{
     await http.post(
         Uri.parse(
             "${MyConfig().SERVER}/barterit/php/deduct_token.php"), // Need to change
@@ -330,6 +340,79 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         }
       }
       setState(() {});
-    }).timeout(const Duration(seconds: 5));
+    }).timeout(const Duration(seconds: 5));}
+  }
+  
+  void loadOwneritem() {
+    if (widget.user.id == "na") {
+      setState(() {
+        // titlecenter = "Unregistered User";
+      });
+      return;
+    }
+
+    http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/load_owner_item.php"),
+        body: {"userid": widget.user.id}).then((response) {
+      //print(response.body);
+      log(response.body);
+      itemList.clear();
+      if (response.statusCode == 200) {
+        var jsondata = jsonDecode(response.body);
+        if (jsondata['status'] == "success") {
+          var extractdata = jsondata['data'];
+
+          extractdata['item'].forEach((v) {
+            itemList.add(Item.fromJson(v));
+          });
+          
+        }
+        setState(() {});
+      }
+    });
+  }
+  
+  void _moreToken() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          title: const Text(
+            "Your token is not enough",
+            style: TextStyle(),
+          ),
+          content: const Text(
+              "Do you want to topup your token ",
+              style: TextStyle()),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                "Yes",
+                style: TextStyle(),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => TopUpTokenScreen(
+                                  user: widget.user,
+                                )));
+              },
+            ),
+            TextButton(
+              child: const Text(
+                "No",
+                style: TextStyle(),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

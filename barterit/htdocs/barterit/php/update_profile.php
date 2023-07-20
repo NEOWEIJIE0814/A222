@@ -14,15 +14,21 @@ if (isset($_POST['image'])) {
 	file_put_contents($path, $decoded_string);
 	$response = array('status' => 'success', 'data' => null);
     sendJsonResponse($response);
-    // $decoded_string = base64_decode($encoded_string);
-    // $path = '../assets/profileimages/' . $userid . '.png';
-    // if (file_put_contents($path, $decoded_string)){
-    //     $response = array('status' => 'success', 'data' => null);
-    //     sendJsonResponse($response);
-    // }else{
-    //     $response = array('status' => 'failed', 'data' => null);
-    //     sendJsonResponse($response);
-    // }
+	
+	//$pathdir = '../assets/profileimages/';
+    //if(is_dir($pathdir) && is_writable($pathdir)){
+	//	$pathok = "OK";
+	//} else{
+	//	$pathok = "FAILED";
+	//}
+	//if(file_put_contents($path, $decoded_string)){
+	//	$response = array('status' => 'success', 'data'= $pathok);
+	//	sendJsonResponse($response);
+	//}else {
+	//	$response = array('status' => 'failed', 'data'= $pathok);
+	//	sendJsonResponse($response);
+	//}
+   
     die();
 }
 

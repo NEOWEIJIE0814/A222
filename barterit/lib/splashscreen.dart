@@ -8,23 +8,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'myconfig.dart';
 
-
-
 class SplashScreen extends StatefulWidget {
-
-  const SplashScreen({super.key,});
+  const SplashScreen({
+    super.key,
+  });
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  
-@override
-  void initState(){
+  @override
+  void initState() {
     super.initState();
     checkAndLogin();
-    
+    //login();
   }
 
   @override
@@ -50,9 +48,8 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     );
   }
-  
+
   checkAndLogin() async {
-    
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String email = (prefs.getString('email')) ?? '';
     String password = (prefs.getString('pass')) ?? '';
@@ -60,11 +57,11 @@ class _SplashScreenState extends State<SplashScreen> {
     late User user;
     if (ischeck) {
       try {
-        http.post(
-            Uri.parse("${MyConfig().SERVER}/barterit/php/login.php"),
+        http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/login.php"),
             body: {"email": email, "password": password}).then((response) {
           if (response.statusCode == 200) {
             var jsondata = jsonDecode(response.body);
+            if (jsondata['status'] == "success") {
             user = User.fromJson(jsondata['data']);
             Timer(
                 const Duration(seconds: 3),
@@ -72,17 +69,18 @@ class _SplashScreenState extends State<SplashScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (content) => ControlScreen(user: user))));
+            } 
           } else {
             user = User(
-                id: "na",
-                name: "na",
-                email: "na",
-                phone: "na",
-                datereg: "na",
-                password: "na",
-                otp: "na",
-                token: "0",
-                );
+              id: "na",
+              name: "na",
+              email: "na",
+              phone: "na",
+              datereg: "na",
+              password: "na",
+              otp: "na",
+              token: "0",
+            );
             Timer(
                 const Duration(seconds: 3),
                 () => Navigator.pushReplacement(
@@ -98,19 +96,43 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     } else {
       user = User(
-          id: "na",
-          name: "na",
-          phone: "na",
-          email: "na",  
-          datereg: "na",
-          password: "na",
-          otp: "na",
-          token: "0",
-          );
+        id: "na",
+        name: "na",
+        phone: "na",
+        email: "na",
+        datereg: "na",
+        password: "na",
+        otp: "na",
+        token: "0",
+      );
       Timer(
           const Duration(seconds: 3),
-          () => Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (content) => ControlScreen(user: user))));
+          () => Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (content) => ControlScreen(user: user))));
     }
   }
+  
+  void login() {
+    late User user;
+     user = User(
+        id: "na",
+        name: "na",
+        phone: "na",
+        email: "na",
+        datereg: "na",
+        password: "na",
+        otp: "na",
+        token: "0",
+      );
+      Timer(
+          const Duration(seconds: 3),
+          () => Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (content) => ControlScreen(user: user))));
+  }
+
+  
 }

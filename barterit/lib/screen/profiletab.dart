@@ -67,13 +67,14 @@ class _ProfileTabState extends State<ProfileTab> {
       isDisable = false;
     }
     print("dispose profile");
+    
   }
 
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
-    user.token = widget.user.token.toString();
+    
 
     return Scaffold(
       appBar: AppBar(
@@ -231,7 +232,7 @@ class _ProfileTabState extends State<ProfileTab> {
           Container(
             width: screenWidth,
             alignment: Alignment.center,
-            color: Theme.of(context).colorScheme.onPrimaryContainer,
+            color: Theme.of(context).colorScheme.primary,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
               child: Text("PROFILE SETTINGS",
@@ -715,7 +716,7 @@ class _ProfileTabState extends State<ProfileTab> {
   void changePass() {
     http.post(
         Uri.parse(
-            "${MyConfig().SERVER}/barterit/php/update_profile.php"), // need to change
+            "${MyConfig().SERVER}/barterit/php/update_profile.php"), 
         body: {
           "userid": widget.user.id,
           "oldpass": _oldpasswordController.text,
@@ -754,7 +755,7 @@ class _ProfileTabState extends State<ProfileTab> {
 
         if (jsondata['status'] == 'success') {
           user = User.fromJson(jsondata['data']);
-
+          
           setState(() {});
         }
       }

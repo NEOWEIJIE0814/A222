@@ -72,10 +72,10 @@ class _BarterScreenState extends State<BarterScreen> {
                               )));
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("No item in cart")));
+                      const SnackBar(content: Text("No items are bartering")));
                 }
               },
-              icon: const Icon(Icons.shopping_cart),
+              icon: const Icon(Icons.call_made),
               label: Text(cartqty.toString()),
             ),
           ],

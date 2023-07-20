@@ -10,7 +10,7 @@ include_once("dbconnect.php");
 
 if (isset($_POST['userid'])){
 	$userid = $_POST['userid'];	
-	$sqlcart = "SELECT * FROM `tbl_carts` INNER JOIN `tbl_items` ON tbl_carts.item_id = tbl_items.item_id WHERE tbl_carts.user_id = '$userid'";
+	$sqlcart = "SELECT * FROM `tbl_carts` INNER JOIN `tbl_items` ON tbl_carts.item_id = tbl_items.item_id WHERE tbl_carts.barter_id = '$userid'";
 }
 
 $result = $conn->query($sqlcart);

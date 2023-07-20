@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:barterit/myconfig.dart';
 import 'package:barterit/screen/newitemscreen.dart';
+import 'package:barterit/screen/requestscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../model/item.dart';
@@ -23,6 +24,7 @@ class _OwnerItemScreenState extends State<OwnerItemScreen> {
   late List<Widget> tabchildren;
   String maintitle = "Owner";
   List<Item> itemList = <Item>[];
+  int cartqty = 0;
 
   @override
   void initState() {
@@ -53,6 +55,27 @@ class _OwnerItemScreenState extends State<OwnerItemScreen> {
         backgroundColor: Colors.transparent,
         foregroundColor: Theme.of(context).colorScheme.secondary,
         elevation: 0,
+        actions: [
+            
+            TextButton.icon(
+              onPressed: () {
+                if (cartqty  > 0) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (content) => RequestScreen(
+                                user: widget.user,
+                            
+                              )));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("No Barter Request")));
+                }
+              },
+              icon: const Icon(Icons.call_received_outlined),
+              label: Text(cartqty.toString()), // need to change
+            ),
+          ],
       ),
       body: RefreshIndicator(
       onRefresh: () async {
@@ -152,7 +175,7 @@ class _OwnerItemScreenState extends State<OwnerItemScreen> {
       return;
     }
 
-    http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/load_item.php"),
+    http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/load_owner_item.php"),
         body: {"userid": widget.user.id}).then((response) {
       //print(response.body);
       log(response.body);
@@ -161,10 +184,12 @@ class _OwnerItemScreenState extends State<OwnerItemScreen> {
         var jsondata = jsonDecode(response.body);
         if (jsondata['status'] == "success") {
           var extractdata = jsondata['data'];
+          cartqty  = int.parse(jsondata['cartqty'].toString());
+          
           extractdata['item'].forEach((v) {
             itemList.add(Item.fromJson(v));
           });
-          print(itemList[0].itemName);
+          
         }
         setState(() {});
       }

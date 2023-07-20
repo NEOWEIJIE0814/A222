@@ -5,6 +5,7 @@ import 'package:barterit/screen/profiletab.dart';
 import 'package:flutter/material.dart';
 
 import 'barterscreen.dart';
+import 'contactscreen.dart';
 
 class ControlScreen extends StatefulWidget {
   final User user;
@@ -29,7 +30,7 @@ class _ControlScreenState extends State<ControlScreen> {
         user: widget.user,
       ),
       OwnerItemScreen(user: widget.user),
-      LoginScreen(user: widget.user),
+      ContactScreen(user: widget.user),
       ProfileTab(user: widget.user),
     ];
   }
@@ -63,9 +64,9 @@ class _ControlScreenState extends State<ControlScreen> {
                 label: "Owner"),
             BottomNavigationBarItem(
                 icon: Icon(
-                  Icons.door_front_door,
+                  Icons.contacts,
                 ),
-                label: "Login"),
+                label: "Contact"),
             BottomNavigationBarItem(
                 icon: Icon(
                   Icons.person,
@@ -85,7 +86,7 @@ class _ControlScreenState extends State<ControlScreen> {
         maintitle = "Owner";
       }
       if (_currentIndex == 2) {
-        maintitle = "Login";
+        maintitle = "Contact";
       }
       if (_currentIndex == 3) {
         maintitle = "Profile";

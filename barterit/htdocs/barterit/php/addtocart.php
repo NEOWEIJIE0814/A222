@@ -12,6 +12,7 @@ $cartqty = $_POST['cart_qty'];
 $cartprice = $_POST['cart_price'];
 $userid = $_POST['userid'];
 $barterid = $_POST['barterid'];
+$barterstatus = $_POST['barter_status'];
 
 $checkitemid = "SELECT * FROM `tbl_carts` WHERE `user_id` = '$userid' AND  `item_id` = '$item_id'";
 
@@ -21,7 +22,7 @@ $numresult = $resultqty->num_rows;
 if ($numresult > 0) {
 	$sql = "UPDATE `tbl_carts` SET `cart_qty`= (cart_qty + $cartqty),`cart_price`= (cart_price+$cartprice) WHERE `user_id` = '$userid' AND  `item_id` = '$item_id'";
 }else{
-	$sql = "INSERT INTO `tbl_carts`(`item_id`, `cart_qty`, `cart_price`, `user_id`, `barter_id`) VALUES ('$item_id','$cartqty','$cartprice','$userid','$barterid')";
+	$sql = "INSERT INTO `tbl_carts`(`item_id`, `cart_qty`, `cart_price`, `user_id`, `barter_id`,`barter_status` ) VALUES ('$item_id','$cartqty','$cartprice','$userid','$barterid', '$barterstatus')";
 }
 
 if ($conn->query($sql) === TRUE) {
